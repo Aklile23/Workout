@@ -44,7 +44,7 @@ class SettingsRepository @Inject constructor(
     val settings: Flow<AppSettings> = context.dataStore.data.map { p ->
         AppSettings(
             themeMode = runCatching { ThemeMode.valueOf(p[Keys.THEME] ?: "DARK") }.getOrDefault(ThemeMode.DARK),
-            dynamicColor = p[Keys.DYNAMIC] ?: false,
+            dynamicColor = false,
             barWeightKg = p[Keys.BAR] ?: 20.0,
             defaultRestSeconds = p[Keys.REST] ?: 120,
             reminderEnabled = p[Keys.REMINDER_ON] ?: false,

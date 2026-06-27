@@ -1,17 +1,14 @@
 package com.mypec.app.feature.progress
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FitnessCenter
-import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,9 +20,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mypec.app.core.Format
+import com.mypec.app.ui.components.AnimatedAppear
 import com.mypec.app.ui.components.BarChart
 import com.mypec.app.ui.components.LineChart
 import com.mypec.app.ui.components.MyPecCard
+import com.mypec.app.ui.components.ScreenHeader
 import com.mypec.app.ui.components.SectionHeader
 import com.mypec.app.ui.components.StatTile
 
@@ -37,17 +36,23 @@ fun ProgressScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            Spacer(Modifier.height(8.dp))
-            Text("Progress", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            AnimatedAppear {
+                ScreenHeader(
+                    title = "Progress",
+                    subtitle = "Volume, weight, and muscle trends",
+                )
+            }
         }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                StatTile("Total volume", "${Format.kgPlain(state.totalVolume)} kg", Icons.Filled.FitnessCenter, Modifier.weight(1f))
-                StatTile("Total sets", "${state.totalSets}", Icons.Filled.FitnessCenter, accent = MaterialTheme.colorScheme.secondary, modifier = Modifier.weight(1f))
+            AnimatedAppear(delayMillis = 60) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    StatTile("Total volume", "${Format.kgPlain(state.totalVolume)} kg", Icons.Filled.FitnessCenter, Modifier.weight(1f))
+                    StatTile("Total sets", "${state.totalSets}", Icons.Filled.FitnessCenter, modifier = Modifier.weight(1f))
+                }
             }
         }
 
@@ -55,9 +60,14 @@ fun ProgressScreen(
         item {
             MyPecCard {
                 state.latestBodyWeight?.let {
-                    Text(Format.kg(it), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                    Text(
+                        Format.kg(it),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(Modifier.height(12.dp))
                 }
-                Spacer(Modifier.height(8.dp))
                 LineChart(points = state.bodyWeightPoints)
             }
         }
@@ -68,6 +78,6 @@ fun ProgressScreen(
         item { SectionHeader("Volume by muscle") }
         item { MyPecCard { BarChart(values = state.muscleVolume) } }
 
-        item { Spacer(Modifier.height(24.dp)) }
+        item { Spacer(Modifier.height(8.dp)) }
     }
 }

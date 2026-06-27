@@ -28,10 +28,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mypec.app.core.DateUtils
 import com.mypec.app.data.local.entity.WorkoutSessionEntity
+import com.mypec.app.ui.components.AnimatedAppear
 import com.mypec.app.ui.components.EmptyState
 import com.mypec.app.ui.components.MyPecCard
 import com.mypec.app.ui.components.Pill
+import com.mypec.app.ui.components.ScreenHeader
 import com.mypec.app.ui.components.SectionHeader
+import com.mypec.app.ui.components.StatusKind
+import com.mypec.app.ui.components.StatusPill
 
 @Composable
 fun HistoryScreen(
@@ -41,22 +45,33 @@ fun HistoryScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            Spacer(Modifier.height(8.dp))
-            Text("History", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            AnimatedAppear {
+                ScreenHeader(
+                    title = "History",
+                    subtitle = "${state.completedCount} completed · ${state.skippedCount} skipped",
+                )
+            }
         }
         item {
-            MyPecCard {
-                Text("Last 12 weeks", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.height(12.dp))
-                Heatmap(state.statusByDay)
-                Spacer(Modifier.height(12.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Pill("${state.completedCount} completed", color = MaterialTheme.colorScheme.secondary)
-                    Pill("${state.skippedCount} skipped", color = MaterialTheme.colorScheme.error)
+            AnimatedAppear(delayMillis = 60) {
+                MyPecCard {
+                    Text(
+                        "Last 12 weeks",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    Heatmap(state.statusByDay)
+                    Spacer(Modifier.height(14.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Pill("${state.completedCount} completed", color = MaterialTheme.colorScheme.primary)
+                        Pill("${state.skippedCount} skipped", color = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         }
@@ -64,36 +79,49 @@ fun HistoryScreen(
 
         if (state.sessions.isEmpty()) {
             item {
-                EmptyState(
-                    title = "No sessions yet",
-                    subtitle = "Start a workout from Home and it'll show up here.",
-                    icon = Icons.Filled.CalendarMonth,
-                )
+                MyPecCard {
+                    EmptyState(
+                        title = "No sessions yet",
+                        subtitle = "Start a workout from Home and it'll show up here.",
+                        icon = Icons.Filled.CalendarMonth,
+                    )
+                }
             }
         } else {
             items(state.sessions, key = { it.id }) { session ->
-                SessionRow(session)
+                AnimatedAppear(delayMillis = 80) {
+                    SessionRow(session)
+                }
             }
         }
-        item { Spacer(Modifier.height(24.dp)) }
+        item { Spacer(Modifier.height(8.dp)) }
     }
 }
 
 @Composable
 private fun SessionRow(session: WorkoutSessionEntity) {
     MyPecCard {
-        Row {
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(session.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text(DateUtils.formatMedium(session.dateEpochDay), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    session.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    DateUtils.formatMedium(session.dateEpochDay),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
-            val (label, color) = when (session.status) {
-                "COMPLETED" -> "Completed" to MaterialTheme.colorScheme.secondary
-                "SKIPPED" -> "Skipped" to MaterialTheme.colorScheme.error
-                "IN_PROGRESS" -> "In progress" to MaterialTheme.colorScheme.tertiary
-                else -> "Planned" to MaterialTheme.colorScheme.primary
+            val (label, kind) = when (session.status) {
+                "COMPLETED" -> "Completed" to StatusKind.Done
+                "SKIPPED" -> "Skipped" to StatusKind.Skipped
+                "IN_PROGRESS" -> "In progress" to StatusKind.Active
+                else -> "Planned" to StatusKind.Neutral
             }
-            Pill(label, color = color)
+            StatusPill(label, kind)
         }
     }
 }
@@ -104,7 +132,7 @@ private fun Heatmap(statusByDay: Map<Long, String>) {
     val weeks = 12
     val days = weeks * 7
     val start = today - (days - 1)
-    val completed = MaterialTheme.colorScheme.secondary
+    val completed = MaterialTheme.colorScheme.primary
     val skipped = MaterialTheme.colorScheme.error
     val empty = MaterialTheme.colorScheme.surfaceVariant
 

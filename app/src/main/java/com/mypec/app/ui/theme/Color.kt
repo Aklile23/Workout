@@ -13,10 +13,10 @@ val Coral = Color(0xFFFF6B6B)
 
 // ---- Dark neutrals (charcoal) ----
 val DarkBg = Color(0xFF0A0A0C)
-val DarkSurface = Color(0xFF141416)
-val DarkSurfaceVariant = Color(0xFF222227)
+val DarkSurface = Color(0xFF1A1A1E)
+val DarkSurfaceVariant = Color(0xFF2A2A30)
 val DarkOnBg = Color(0xFFF4F4F5)
-val DarkOnBgMuted = Color(0xFF97969E)
+val DarkOnBgMuted = Color(0xFFAEADB6)
 val DarkOnPrimary = OnAccent
 
 // ---- Light neutrals ----

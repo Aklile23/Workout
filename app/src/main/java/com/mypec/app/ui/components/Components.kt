@@ -70,7 +70,12 @@ import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
-import kotlinx.coroutines.delay
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 
 /** Shared Haze state so glass cards can blur the aurora background drawn in [AppBackground]. */
 val LocalHazeState = staticCompositionLocalOf<HazeState?> { null }
@@ -117,7 +122,7 @@ private fun Color.luminanceIsDark(): Boolean =
 private fun Modifier.glass(shape: Shape): Modifier {
     val scheme = MaterialTheme.colorScheme
     // Flat, solid card with a hairline border. No heavy shadow or glossy sheen.
-    val borderColor = scheme.onSurface.copy(alpha = 0.08f)
+    val borderColor = scheme.onSurface.copy(alpha = 0.12f)
     return this
         .clip(shape)
         .background(scheme.surface)
@@ -151,12 +156,220 @@ fun SectionHeader(
     action: (@Composable () -> Unit)? = null,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 6.dp),
+        modifier = modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        Text(
+            title,
+            style = MaterialTheme.typography.labelLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         action?.invoke()
+    }
+}
+
+/** Consistent page title used at the top of every tab screen. */
+@Composable
+fun ScreenHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+) {
+    Column(modifier.padding(top = 14.dp, bottom = 4.dp)) {
+        Text(
+            title,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        if (subtitle != null) {
+            Text(
+                subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp),
+            )
+        }
+    }
+}
+
+enum class StatusKind { Active, Done, Skipped, Neutral }
+
+@Composable
+fun StatusPill(
+    text: String,
+    kind: StatusKind,
+    modifier: Modifier = Modifier,
+) {
+    val color = when (kind) {
+        StatusKind.Active, StatusKind.Done -> MaterialTheme.colorScheme.primary
+        StatusKind.Skipped -> MaterialTheme.colorScheme.error
+        StatusKind.Neutral -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    Pill(text, modifier = modifier, color = color)
+}
+
+/** Large metric value for tool/calculator results. */
+@Composable
+fun MetricValue(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier) {
+        Text(
+            label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            value,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+    }
+}
+
+@Composable
+fun ChartEmptyState(
+    message: String,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier
+            .fillMaxWidth()
+            .height(140.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+fun AppTextField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    keyboardType: KeyboardType = KeyboardType.Number,
+) {
+    val shape = RoundedCornerShape(12.dp)
+    val scheme = MaterialTheme.colorScheme
+    Column(modifier) {
+        Text(
+            label,
+            style = MaterialTheme.typography.labelMedium,
+            color = scheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(6.dp))
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            singleLine = true,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                color = scheme.onSurface,
+                fontWeight = FontWeight.SemiBold,
+            ),
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = ImeAction.Done),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape)
+                .background(scheme.surfaceVariant)
+                .border(1.dp, scheme.outline.copy(alpha = 0.35f), shape)
+                .padding(horizontal = 14.dp, vertical = 13.dp),
+        )
+    }
+}
+
+@Composable
+fun SettingToggle(
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val scheme = MaterialTheme.colorScheme
+    Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(title, fontWeight = FontWeight.SemiBold, color = scheme.onSurface)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = OnAccent,
+                checkedTrackColor = scheme.primary,
+                uncheckedThumbColor = scheme.onSurfaceVariant,
+                uncheckedTrackColor = scheme.surfaceVariant,
+            ),
+        )
+    }
+}
+
+@Composable
+fun ThemeChip(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val scheme = MaterialTheme.colorScheme
+    val bg = if (selected) scheme.primary else scheme.surfaceVariant
+    val fg = if (selected) OnAccent else scheme.onSurfaceVariant
+    Box(
+        modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(bg)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+    ) {
+        Text(label, color = fg, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.labelLarge)
+    }
+}
+
+@Composable
+fun SettingStepper(
+    label: String,
+    value: String,
+    onMinus: () -> Unit,
+    onPlus: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val scheme = MaterialTheme.colorScheme
+    Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text(label, Modifier.weight(1f), fontWeight = FontWeight.SemiBold, color = scheme.onSurface)
+        Box(
+            Modifier
+                .size(36.dp)
+                .clip(CircleShape)
+                .background(scheme.surfaceVariant)
+                .clickable(onClick = onMinus),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text("−", fontWeight = FontWeight.Bold, color = scheme.onSurface)
+        }
+        Text(value, Modifier.padding(horizontal = 14.dp), fontWeight = FontWeight.Bold, color = scheme.onSurface)
+        Box(
+            Modifier
+                .size(36.dp)
+                .clip(CircleShape)
+                .background(scheme.primary)
+                .clickable(onClick = onPlus),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text("＋", fontWeight = FontWeight.Bold, color = OnAccent)
+        }
     }
 }
 
@@ -225,18 +438,8 @@ fun GlassButton(
             .fillMaxWidth()
             .graphicsLayer { scaleX = pressScale; scaleY = pressScale }
             .clip(shape)
-            .background(
-                Brush.verticalGradient(
-                    listOf(scheme.surface.copy(alpha = 0.6f), scheme.surface.copy(alpha = 0.3f)),
-                ),
-            )
-            .border(
-                1.dp,
-                Brush.linearGradient(
-                    listOf(contentColor.copy(alpha = 0.4f), contentColor.copy(alpha = 0.1f)),
-                ),
-                shape,
-            )
+            .background(scheme.surfaceVariant)
+            .border(1.dp, scheme.onSurface.copy(alpha = 0.12f), shape)
             .clickable(
                 interactionSource = interaction,
                 indication = null,
@@ -285,6 +488,7 @@ fun StatTile(
             value,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(top = 12.dp),
         )
         Text(

@@ -49,7 +49,10 @@ import com.mypec.app.ui.components.GlassButton
 import com.mypec.app.ui.components.GradientButton
 import com.mypec.app.ui.components.HeroCard
 import com.mypec.app.ui.components.MyPecCard
-import com.mypec.app.ui.components.Pill
+import com.mypec.app.ui.components.ScreenHeader
+import com.mypec.app.ui.components.SectionHeader
+import com.mypec.app.ui.components.StatusKind
+import com.mypec.app.ui.components.StatusPill
 import com.mypec.app.ui.components.StatTile
 import com.mypec.app.ui.components.WeekProgress
 import com.mypec.app.ui.navigation.Dest
@@ -70,22 +73,15 @@ fun HomeScreen(
         item {
             AnimatedAppear {
                 Row(
-                    Modifier.fillMaxWidth().padding(top = 14.dp),
+                    Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            "Welcome back",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Text(
-                            state.todayDateLabel,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
+                    ScreenHeader(
+                        title = "Welcome back",
+                        subtitle = state.todayDateLabel,
+                        modifier = Modifier.weight(1f),
+                    )
                     Box(
                         Modifier
                             .size(48.dp)
@@ -149,11 +145,12 @@ fun HomeScreen(
             item {
                 AnimatedAppear(delayMillis = 90) {
                     MyPecCard {
-                        Pill("In progress", color = MaterialTheme.colorScheme.tertiary)
+                        StatusPill("In progress", StatusKind.Active)
                         Text(
                             active.title,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(top = 10.dp),
                         )
                         Spacer(Modifier.height(14.dp))
@@ -197,6 +194,7 @@ fun HomeScreen(
                                 state.todayName,
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                             state.todayDay?.day?.subtitle?.let {
                                 Text(
@@ -244,7 +242,7 @@ fun HomeScreen(
 
                         todayStatus == "SKIPPED" -> {
                             Spacer(Modifier.height(16.dp))
-                            Pill("Skipped today", color = MaterialTheme.colorScheme.error)
+                            StatusPill("Skipped today", StatusKind.Skipped)
                             Spacer(Modifier.height(12.dp))
                             GlassButton(
                                 text = "Undo skip",
@@ -318,6 +316,7 @@ fun HomeScreen(
                         "Quick access",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(Modifier.height(16.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

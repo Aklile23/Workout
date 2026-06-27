@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
             }
-            MyPecTheme(darkTheme = dark, dynamicColor = settings.dynamicColor) {
+            MyPecTheme(darkTheme = dark, dynamicColor = false) {
                 var showSplash by remember { mutableStateOf(true) }
                 Crossfade(targetState = showSplash, animationSpec = tween(500), label = "splash") { splash ->
                     if (splash) {
