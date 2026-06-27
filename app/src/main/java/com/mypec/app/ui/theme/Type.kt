@@ -8,31 +8,107 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.mypec.app.R
 
-// One clean sans (Inter) for everything. Bundled variable font => guaranteed
-// offline, no Play Services dependency. Weight is applied via the wght axis.
-val BodyFamily = FontFamily(
-    Font(R.font.inter, FontWeight.Normal),
-    Font(R.font.inter, FontWeight.Medium),
-    Font(R.font.inter, FontWeight.SemiBold),
-    Font(R.font.inter, FontWeight.Bold),
+// Static Inter files (one per weight). Variable fonts often fall back to system
+// Roboto on Android when wght axis mapping fails — static files are reliable.
+val InterFamily = FontFamily(
+    Font(R.font.inter_regular, FontWeight.Normal),
+    Font(R.font.inter_medium, FontWeight.Medium),
+    Font(R.font.inter_semibold, FontWeight.SemiBold),
+    Font(R.font.inter_bold, FontWeight.Bold),
 )
 
-val DisplayFamily = BodyFamily
+val DisplayFamily = InterFamily
+val BodyFamily = InterFamily
 
-val MyPecTypography = Typography(
-    displayLarge = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Bold, fontSize = 40.sp, lineHeight = 46.sp, letterSpacing = (-0.8).sp),
-    displayMedium = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 38.sp, letterSpacing = (-0.6).sp),
-    displaySmall = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Bold, fontSize = 26.sp, lineHeight = 32.sp, letterSpacing = (-0.4).sp),
-    headlineLarge = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Bold, fontSize = 24.sp, lineHeight = 30.sp, letterSpacing = (-0.3).sp),
-    headlineMedium = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.SemiBold, fontSize = 21.sp, lineHeight = 28.sp, letterSpacing = (-0.2).sp),
-    headlineSmall = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.SemiBold, fontSize = 18.sp, lineHeight = 24.sp, letterSpacing = (-0.1).sp),
-    titleLarge = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, lineHeight = 24.sp, letterSpacing = 0.sp),
-    titleMedium = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, lineHeight = 21.sp, letterSpacing = 0.sp),
-    titleSmall = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Medium, fontSize = 13.sp, lineHeight = 18.sp, letterSpacing = 0.1.sp),
-    bodyLarge = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Normal, fontSize = 15.sp, lineHeight = 22.sp, letterSpacing = 0.1.sp),
-    bodyMedium = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.1.sp),
-    bodySmall = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.2.sp),
-    labelLarge = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, lineHeight = 18.sp, letterSpacing = 0.1.sp),
-    labelMedium = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Medium, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.4.sp),
-    labelSmall = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Medium, fontSize = 11.sp, lineHeight = 14.sp, letterSpacing = 0.5.sp),
+private val base = Typography(defaultFontFamily = InterFamily)
+
+val MyPecTypography = base.copy(
+    displayLarge = base.displayLarge.copy(
+        fontWeight = FontWeight.Bold,
+        fontSize = 36.sp,
+        lineHeight = 42.sp,
+        letterSpacing = (-0.5).sp,
+    ),
+    displayMedium = base.displayMedium.copy(
+        fontWeight = FontWeight.Bold,
+        fontSize = 30.sp,
+        lineHeight = 36.sp,
+        letterSpacing = (-0.4).sp,
+    ),
+    displaySmall = base.displaySmall.copy(
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        lineHeight = 30.sp,
+        letterSpacing = (-0.3).sp,
+    ),
+    headlineLarge = base.headlineLarge.copy(
+        fontWeight = FontWeight.Bold,
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = (-0.2).sp,
+    ),
+    headlineMedium = base.headlineMedium.copy(
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
+        lineHeight = 26.sp,
+        letterSpacing = (-0.15).sp,
+    ),
+    headlineSmall = base.headlineSmall.copy(
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+        letterSpacing = (-0.1).sp,
+    ),
+    titleLarge = base.titleLarge.copy(
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 17.sp,
+        lineHeight = 24.sp,
+    ),
+    titleMedium = base.titleMedium.copy(
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 15.sp,
+        lineHeight = 22.sp,
+    ),
+    titleSmall = base.titleSmall.copy(
+        fontWeight = FontWeight.Medium,
+        fontSize = 13.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.1.sp,
+    ),
+    bodyLarge = base.bodyLarge.copy(
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.15.sp,
+    ),
+    bodyMedium = base.bodyMedium.copy(
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.1.sp,
+    ),
+    bodySmall = base.bodySmall.copy(
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.2.sp,
+    ),
+    labelLarge = base.labelLarge.copy(
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 13.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.15.sp,
+    ),
+    labelMedium = base.labelMedium.copy(
+        fontWeight = FontWeight.Medium,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.3.sp,
+    ),
+    labelSmall = base.labelSmall.copy(
+        fontWeight = FontWeight.Medium,
+        fontSize = 11.sp,
+        lineHeight = 14.sp,
+        letterSpacing = 0.4.sp,
+    ),
 )
