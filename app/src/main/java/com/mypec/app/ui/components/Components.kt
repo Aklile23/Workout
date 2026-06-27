@@ -67,7 +67,6 @@ import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
-import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.delay
 
 /** Shared Haze state so glass cards can blur the aurora background drawn in [AppBackground]. */
@@ -80,7 +79,7 @@ fun AppBackground(content: @Composable BoxScope.() -> Unit) {
     val dark = MaterialTheme.colorScheme.surface.luminanceIsDark()
     val glowAlpha = if (dark) 0.55f else 0.30f
 
-    val hazeState = rememberHazeState()
+    val hazeState = remember { HazeState() }
 
     val transition = rememberInfiniteTransition(label = "aurora")
     val t by transition.animateFloat(
