@@ -3,15 +3,22 @@ package com.mypec.app.ui
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.mypec.app.ui.components.AppBackground
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -41,37 +48,49 @@ fun MyPecApp() {
     val currentRoute = backStackEntry?.destination?.route
     val showBottomBar = bottomItems.any { it.dest.route == currentRoute }
 
-    Scaffold(
-        bottomBar = {
-            if (showBottomBar) {
-                NavigationBar {
-                    val current = backStackEntry?.destination
-                    bottomItems.forEach { item ->
-                        val selected = current?.hierarchy?.any { it.route == item.dest.route } == true
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = {
-                                navController.navigate(item.dest.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            icon = { Icon(item.icon, contentDescription = item.label) },
-                            label = { Text(item.label) },
-                        )
+    AppBackground {
+        Scaffold(
+            containerColor = Color.Transparent,
+            bottomBar = {
+                if (showBottomBar) {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.78f),
+                        tonalElevation = 0.dp,
+                    ) {
+                        val current = backStackEntry?.destination
+                        bottomItems.forEach { item ->
+                            val selected = current?.hierarchy?.any { it.route == item.dest.route } == true
+                            NavigationBarItem(
+                                selected = selected,
+                                onClick = {
+                                    navController.navigate(item.dest.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                },
+                                icon = { Icon(item.icon, contentDescription = item.label) },
+                                label = { Text(item.label) },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                                    indicatorColor = MaterialTheme.colorScheme.primary,
+                                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                ),
+                            )
+                        }
                     }
                 }
-            }
-        },
-    ) { padding ->
-        NavHost(
-            navController = navController,
-            startDestination = Dest.Home.route,
-            modifier = Modifier.padding(padding),
-            enterTransition = { fadeIn(tween(250)) },
-            exitTransition = { fadeOut(tween(250)) },
-        ) {
+            },
+        ) { padding ->
+            NavHost(
+                navController = navController,
+                startDestination = Dest.Home.route,
+                modifier = Modifier.padding(padding),
+                enterTransition = { fadeIn(tween(280)) + slideInHorizontally(tween(280)) { it / 12 } },
+                exitTransition = { fadeOut(tween(220)) + slideOutHorizontally(tween(220)) { -it / 12 } },
+            ) {
             composable(Dest.Home.route) { HomeScreen(navController) }
             composable(Dest.History.route) { HistoryScreen(navController) }
             composable(Dest.Progress.route) { ProgressScreen(navController) }
@@ -92,6 +111,7 @@ fun MyPecApp() {
                 route = Dest.ExerciseDetail.route,
                 arguments = listOf(navArgument(Dest.ExerciseDetail.ARG) { type = NavType.StringType }),
             ) { ExerciseDetailScreen(navController) }
+            }
         }
     }
 }

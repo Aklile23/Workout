@@ -29,6 +29,7 @@ data class HomeUiState(
     val todayDay: DayWithVariants? = null,
     val isRestDay: Boolean = false,
     val activeSession: WorkoutSessionEntity? = null,
+    val todaySession: WorkoutSessionEntity? = null,
     val adherence: WeeklyAdherence = WeeklyAdherence(0, 0, 0),
     val latestWeight: BodyWeightEntity? = null,
     val loading: Boolean = true,
@@ -59,12 +60,17 @@ class HomeViewModel @Inject constructor(
     ) { days, active, weekSessions, weight ->
         val todayDay = days.firstOrNull { it.day.weekday == todayWeekday }
         val planned = days.count { !it.day.isOptional }
+        val todayEpoch = today.toEpochDay()
+        val todaySession = weekSessions
+            .filter { it.dateEpochDay == todayEpoch && it.id != active?.id }
+            .maxByOrNull { it.updatedAt }
         HomeUiState(
             todayName = todayDay?.day?.title ?: "Rest Day",
             todayDateLabel = DateUtils.formatFull(today.toEpochDay()),
             todayDay = todayDay,
             isRestDay = todayDay == null,
             activeSession = active,
+            todaySession = todaySession,
             adherence = Adherence.forWeek(planned, weekSessions),
             latestWeight = weight,
             loading = false,
@@ -94,6 +100,12 @@ class HomeViewModel @Inject constructor(
                 variantId = day.variants.firstOrNull()?.variant?.id,
                 dateEpochDay = today.toEpochDay(),
             )
+        }
+    }
+
+    fun unskipToday() {
+        viewModelScope.launch {
+            workoutRepository.unskipDay(today.toEpochDay())
         }
     }
 }

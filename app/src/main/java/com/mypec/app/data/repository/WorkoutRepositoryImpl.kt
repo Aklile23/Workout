@@ -132,16 +132,35 @@ class WorkoutRepositoryImpl @Inject constructor(
     }
 
     override suspend fun skipDay(title: String, variantId: String?, dateEpochDay: Long) {
-        workoutDao.upsertSession(
-            WorkoutSessionEntity(
-                id = UUID.randomUUID().toString(),
-                programId = programDao.getActiveProgram()?.id,
-                dayVariantId = variantId,
-                title = title,
-                dateEpochDay = dateEpochDay,
-                status = SessionStatus.SKIPPED.name,
+        val existing = workoutDao.getSessionForDay(dateEpochDay)
+        // Don't overwrite a finished workout, and never create duplicates for the same day.
+        if (existing != null) {
+            if (existing.status == SessionStatus.COMPLETED.name) return
+            workoutDao.upsertSession(
+                existing.copy(
+                    status = SessionStatus.SKIPPED.name,
+                    title = title,
+                    dayVariantId = existing.dayVariantId ?: variantId,
+                    updatedAt = DateUtils.nowMillis(),
+                    dirty = true,
+                )
             )
-        )
+        } else {
+            workoutDao.upsertSession(
+                WorkoutSessionEntity(
+                    id = UUID.randomUUID().toString(),
+                    programId = programDao.getActiveProgram()?.id,
+                    dayVariantId = variantId,
+                    title = title,
+                    dateEpochDay = dateEpochDay,
+                    status = SessionStatus.SKIPPED.name,
+                )
+            )
+        }
+    }
+
+    override suspend fun unskipDay(dateEpochDay: Long) {
+        workoutDao.softDeleteSkippedForDay(dateEpochDay, DateUtils.nowMillis())
     }
 
     override suspend fun getPreviousSets(

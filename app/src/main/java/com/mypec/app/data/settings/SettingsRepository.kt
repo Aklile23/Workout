@@ -17,7 +17,7 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 data class AppSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val dynamicColor: Boolean = true,
+    val dynamicColor: Boolean = false,
     val barWeightKg: Double = 20.0,
     val defaultRestSeconds: Int = 120,
     val reminderEnabled: Boolean = false,
@@ -44,7 +44,7 @@ class SettingsRepository @Inject constructor(
     val settings: Flow<AppSettings> = context.dataStore.data.map { p ->
         AppSettings(
             themeMode = runCatching { ThemeMode.valueOf(p[Keys.THEME] ?: "SYSTEM") }.getOrDefault(ThemeMode.SYSTEM),
-            dynamicColor = p[Keys.DYNAMIC] ?: true,
+            dynamicColor = p[Keys.DYNAMIC] ?: false,
             barWeightKg = p[Keys.BAR] ?: 20.0,
             defaultRestSeconds = p[Keys.REST] ?: 120,
             reminderEnabled = p[Keys.REMINDER_ON] ?: false,

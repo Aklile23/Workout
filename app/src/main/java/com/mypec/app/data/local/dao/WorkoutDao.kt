@@ -31,6 +31,9 @@ interface WorkoutDao {
     @Query("SELECT * FROM workout_sessions WHERE isDeleted = 0 AND dateEpochDay = :day LIMIT 1")
     suspend fun getSessionForDay(day: Long): WorkoutSessionEntity?
 
+    @Query("UPDATE workout_sessions SET isDeleted = 1, updatedAt = :now, dirty = 1 WHERE dateEpochDay = :day AND status = 'SKIPPED' AND isDeleted = 0")
+    suspend fun softDeleteSkippedForDay(day: Long, now: Long)
+
     @Query("SELECT * FROM workout_sessions WHERE status = 'IN_PROGRESS' AND isDeleted = 0 ORDER BY startedAt DESC LIMIT 1")
     fun observeActiveSession(): Flow<WorkoutSessionEntity?>
 

@@ -44,6 +44,7 @@ interface WorkoutRepository {
     suspend fun addExerciseToSession(sessionId: String, exerciseId: String)
     suspend fun completeSession(id: String)
     suspend fun skipDay(title: String, variantId: String?, dateEpochDay: Long)
+    suspend fun unskipDay(dateEpochDay: Long)
     suspend fun getPreviousSets(exerciseId: String, excludeSessionId: String): List<SetLogEntity>
     suspend fun copyPreviousIntoSession(sessionId: String)
     fun observeAllCompletedSets(): Flow<List<SetLogEntity>>
