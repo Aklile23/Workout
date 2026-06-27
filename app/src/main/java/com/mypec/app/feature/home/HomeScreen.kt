@@ -1,14 +1,19 @@
 package com.mypec.app.feature.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -18,29 +23,37 @@ import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mypec.app.core.Format
-import com.mypec.app.ui.components.AdherenceRing
 import com.mypec.app.ui.components.AnimatedAppear
+import com.mypec.app.ui.components.CircleIconButton
 import com.mypec.app.ui.components.EmptyState
 import com.mypec.app.ui.components.GlassButton
 import com.mypec.app.ui.components.GradientButton
+import com.mypec.app.ui.components.HeroCard
 import com.mypec.app.ui.components.MyPecCard
 import com.mypec.app.ui.components.Pill
-import com.mypec.app.ui.components.SectionHeader
 import com.mypec.app.ui.components.StatTile
+import com.mypec.app.ui.components.WeekProgress
 import com.mypec.app.ui.navigation.Dest
 import com.mypec.app.ui.theme.AccentGradient
+import com.mypec.app.ui.theme.PrimaryGradient
 import com.mypec.app.ui.theme.WarmGradient
 
 @Composable
@@ -52,23 +65,82 @@ fun HomeScreen(
     val todayStatus = state.todaySession?.status
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
             AnimatedAppear {
-                Column {
-                    Spacer(Modifier.height(12.dp))
+                Row(
+                    Modifier.fillMaxWidth().padding(top = 14.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            "Welcome back",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            state.todayDateLabel,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                    Box(
+                        Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Brush.linearGradient(AccentGradient)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            Icons.Filled.FitnessCenter,
+                            contentDescription = "myPeC",
+                            tint = MaterialTheme.colorScheme.onSecondary,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
+            AnimatedAppear(delayMillis = 60) {
+                HeroCard {
                     Text(
-                        "myPeC",
-                        style = MaterialTheme.typography.headlineMedium,
+                        "WEEKLY PROGRESS",
+                        style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = Color.White.copy(alpha = 0.75f),
                     )
-                    Text(
-                        state.todayDateLabel,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    Spacer(Modifier.height(10.dp))
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            "${state.adherence.percent}%",
+                            style = MaterialTheme.typography.displayMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        )
+                        Spacer(Modifier.weight(1f))
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(
+                                "${state.adherence.completed}/${state.adherence.planned}",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                            )
+                            Text(
+                                "workouts",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.White.copy(alpha = 0.75f),
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(18.dp))
+                    WeekProgress(
+                        completed = state.adherence.completed,
+                        planned = state.adherence.planned.coerceAtLeast(1),
                     )
                 }
             }
@@ -76,16 +148,16 @@ fun HomeScreen(
 
         state.activeSession?.let { active ->
             item {
-                AnimatedAppear(delayMillis = 60) {
+                AnimatedAppear(delayMillis = 90) {
                     MyPecCard {
                         Pill("In progress", color = MaterialTheme.colorScheme.tertiary)
                         Text(
                             active.title,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(top = 8.dp),
+                            modifier = Modifier.padding(top = 10.dp),
                         )
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(14.dp))
                         GradientButton(
                             text = "Resume workout",
                             icon = Icons.Filled.PlayArrow,
@@ -97,13 +169,29 @@ fun HomeScreen(
         }
 
         item {
-            AnimatedAppear(delayMillis = 100) {
+            AnimatedAppear(delayMillis = 120) {
                 MyPecCard {
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            Modifier
+                                .size(52.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Brush.linearGradient(PrimaryGradient)),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                if (state.isRestDay) Icons.Filled.MonitorWeight else Icons.Filled.FitnessCenter,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(26.dp),
+                            )
+                        }
+                        Spacer(Modifier.width(14.dp))
                         Column(Modifier.weight(1f)) {
                             Text(
-                                "Today",
+                                "TODAY",
                                 style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
@@ -119,12 +207,6 @@ fun HomeScreen(
                                 )
                             }
                         }
-                        AdherenceRing(
-                            ratio = state.adherence.ratio,
-                            centerText = "${state.adherence.percent}%",
-                            subText = "${state.adherence.completed}/${state.adherence.planned} this week",
-                            size = 112.dp,
-                        )
                     }
 
                     when {
@@ -133,20 +215,21 @@ fun HomeScreen(
                                 "Rest and recover. You can still start a freestyle session.",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 12.dp),
+                                modifier = Modifier.padding(top = 14.dp),
                             )
-                            Spacer(Modifier.height(8.dp))
+                            Spacer(Modifier.height(10.dp))
                             GlassButton(
                                 text = "Freestyle workout",
                                 icon = Icons.Filled.Add,
                                 onClick = { viewModel.startFreestyle { navController.navigate(Dest.Workout.create(it)) } },
+                                contentColor = MaterialTheme.colorScheme.primary,
                             )
                         }
 
                         todayStatus == "COMPLETED" -> {
-                            Spacer(Modifier.height(14.dp))
+                            Spacer(Modifier.height(16.dp))
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                androidx.compose.material3.Icon(
+                                Icon(
                                     Icons.Filled.CheckCircle,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.secondary,
@@ -161,9 +244,9 @@ fun HomeScreen(
                         }
 
                         todayStatus == "SKIPPED" -> {
-                            Spacer(Modifier.height(14.dp))
+                            Spacer(Modifier.height(16.dp))
                             Pill("Skipped today", color = MaterialTheme.colorScheme.error)
-                            Spacer(Modifier.height(10.dp))
+                            Spacer(Modifier.height(12.dp))
                             GlassButton(
                                 text = "Undo skip",
                                 icon = Icons.Filled.Refresh,
@@ -174,7 +257,7 @@ fun HomeScreen(
 
                         else -> {
                             val variants = state.todayDay?.variants.orEmpty()
-                            Spacer(Modifier.height(14.dp))
+                            Spacer(Modifier.height(16.dp))
                             if (variants.size <= 1) {
                                 GradientButton(
                                     text = "Start workout",
@@ -231,17 +314,22 @@ fun HomeScreen(
             }
         }
 
-        item { SectionHeader("Quick access") }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                GlassButton("Program", onClick = { navController.navigate(Dest.Program.route) }, icon = Icons.Filled.CalendarMonth, modifier = Modifier.weight(1f), contentColor = MaterialTheme.colorScheme.primary)
-                GlassButton("Records", onClick = { navController.navigate(Dest.Records.route) }, icon = Icons.Filled.EmojiEvents, modifier = Modifier.weight(1f), contentColor = MaterialTheme.colorScheme.primary)
-            }
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                GlassButton("Exercises", onClick = { navController.navigate(Dest.Exercises.route) }, icon = Icons.Filled.FitnessCenter, modifier = Modifier.weight(1f), contentColor = MaterialTheme.colorScheme.primary)
-                GlassButton("Body", onClick = { navController.navigate(Dest.Body.route) }, icon = Icons.Filled.MonitorWeight, modifier = Modifier.weight(1f), contentColor = MaterialTheme.colorScheme.primary)
+            AnimatedAppear(delayMillis = 200) {
+                MyPecCard {
+                    Text(
+                        "Quick access",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        QuickAction("Program", Icons.Filled.CalendarMonth) { navController.navigate(Dest.Program.route) }
+                        QuickAction("Records", Icons.Filled.EmojiEvents) { navController.navigate(Dest.Records.route) }
+                        QuickAction("Exercises", Icons.Filled.FitnessCenter) { navController.navigate(Dest.Exercises.route) }
+                        QuickAction("Body", Icons.Filled.MonitorWeight) { navController.navigate(Dest.Body.route) }
+                    }
+                }
             }
         }
 
@@ -255,6 +343,35 @@ fun HomeScreen(
             }
         }
 
-        item { Spacer(Modifier.height(24.dp)) }
+        item { Spacer(Modifier.height(8.dp)) }
+    }
+}
+
+@Composable
+private fun RowScope.QuickAction(
+    label: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.weight(1f),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CircleIconButton(
+            icon = icon,
+            onClick = onClick,
+            size = 54.dp,
+            container = MaterialTheme.colorScheme.surfaceVariant,
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = label,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            textAlign = TextAlign.Center,
+        )
     }
 }

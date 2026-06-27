@@ -1,5 +1,6 @@
 package com.mypec.app.ui.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -17,12 +18,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -57,11 +62,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mypec.app.ui.theme.AccentGradient
-import com.mypec.app.ui.theme.GlowBlue
-import com.mypec.app.ui.theme.GlowMint
-import com.mypec.app.ui.theme.GlowPink
 import com.mypec.app.ui.theme.GlowViolet
+import com.mypec.app.ui.theme.Lime
 import com.mypec.app.ui.theme.PrimaryGradient
+import com.mypec.app.ui.theme.VioletGradient
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -77,7 +81,8 @@ val LocalHazeState = staticCompositionLocalOf<HazeState?> { null }
 fun AppBackground(content: @Composable BoxScope.() -> Unit) {
     val base = MaterialTheme.colorScheme.background
     val dark = MaterialTheme.colorScheme.surface.luminanceIsDark()
-    val glowAlpha = if (dark) 0.55f else 0.30f
+    val violetAlpha = if (dark) 0.40f else 0.22f
+    val limeAlpha = if (dark) 0.14f else 0.12f
 
     val hazeState = remember { HazeState() }
 
@@ -85,18 +90,12 @@ fun AppBackground(content: @Composable BoxScope.() -> Unit) {
     val t by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(14000, easing = LinearEasing), RepeatMode.Reverse),
+        animationSpec = infiniteRepeatable(tween(16000, easing = LinearEasing), RepeatMode.Reverse),
         label = "t",
-    )
-    val t2 by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(9000, easing = LinearEasing), RepeatMode.Reverse),
-        label = "t2",
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // The blurrable background layer.
+        // The blurrable background layer: calm near-solid dark with two soft glows.
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -107,30 +106,16 @@ fun AppBackground(content: @Composable BoxScope.() -> Unit) {
                     val h = size.height
                     drawRect(
                         brush = Brush.radialGradient(
-                            colors = listOf(GlowViolet.copy(alpha = glowAlpha), Color.Transparent),
-                            center = Offset(w * (0.15f + 0.25f * t), h * (0.08f + 0.05f * t2)),
-                            radius = w * 1.05f,
-                        ),
-                    )
-                    drawRect(
-                        brush = Brush.radialGradient(
-                            colors = listOf(GlowMint.copy(alpha = glowAlpha * 0.85f), Color.Transparent),
-                            center = Offset(w * (0.95f - 0.25f * t2), h * (0.35f + 0.1f * t)),
+                            colors = listOf(GlowViolet.copy(alpha = violetAlpha), Color.Transparent),
+                            center = Offset(w * (0.18f + 0.12f * t), h * 0.04f),
                             radius = w * 0.95f,
                         ),
                     )
                     drawRect(
                         brush = Brush.radialGradient(
-                            colors = listOf(GlowBlue.copy(alpha = glowAlpha * 0.75f), Color.Transparent),
-                            center = Offset(w * (0.1f + 0.2f * t2), h * (0.95f - 0.08f * t)),
-                            radius = w * 1.0f,
-                        ),
-                    )
-                    drawRect(
-                        brush = Brush.radialGradient(
-                            colors = listOf(GlowPink.copy(alpha = glowAlpha * 0.55f), Color.Transparent),
-                            center = Offset(w * (0.85f - 0.2f * t), h * 0.85f),
-                            radius = w * 0.8f,
+                            colors = listOf(Lime.copy(alpha = limeAlpha), Color.Transparent),
+                            center = Offset(w * (0.92f - 0.1f * t), h * (0.78f + 0.05f * t)),
+                            radius = w * 0.7f,
                         ),
                     )
                 },
@@ -504,4 +489,151 @@ fun AnimatedAppear(
             translationY = offset
         },
     ) { content() }
+}
+
+/** Big gradient hero panel used for the headline metric / today's focus. */
+@Composable
+fun HeroCard(
+    modifier: Modifier = Modifier,
+    gradient: List<Color> = VioletGradient,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val shape = RoundedCornerShape(30.dp)
+    Column(
+        modifier
+            .fillMaxWidth()
+            .shadow(26.dp, shape, clip = false, ambientColor = gradient.first(), spotColor = gradient.first())
+            .clip(shape)
+            .background(Brush.linearGradient(gradient))
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color.White.copy(alpha = 0.10f), Color.Transparent, Color.Black.copy(alpha = 0.08f)),
+                ),
+            )
+            .padding(22.dp),
+        content = content,
+    )
+}
+
+/** Circular icon button with a subtle border + haptics. */
+@Composable
+fun CircleIconButton(
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Dp = 46.dp,
+    container: Color = MaterialTheme.colorScheme.surfaceVariant,
+    tint: Color = MaterialTheme.colorScheme.onSurface,
+    contentDescription: String? = null,
+) {
+    val haptic = LocalHapticFeedback.current
+    Box(
+        modifier
+            .size(size)
+            .clip(CircleShape)
+            .background(container)
+            .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f), CircleShape)
+            .clickable {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            },
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(icon, contentDescription, tint = tint, modifier = Modifier.size(size * 0.46f))
+    }
+}
+
+/** Weekly progress strip: a row of segments, the first [completed] filled with the accent. */
+@Composable
+fun WeekProgress(
+    completed: Int,
+    planned: Int,
+    modifier: Modifier = Modifier,
+) {
+    val total = planned.coerceIn(1, 7)
+    val done = completed.coerceIn(0, total)
+    val trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        repeat(total) { i ->
+            Box(
+                Modifier
+                    .weight(1f)
+                    .height(9.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (i < done) Brush.horizontalGradient(AccentGradient)
+                        else androidx.compose.ui.graphics.SolidColor(trackColor),
+                    ),
+            )
+        }
+    }
+}
+
+data class NavItem(val route: String, val label: String, val icon: ImageVector)
+
+/** Floating pill navigation bar; the active item expands into a filled accent pill. */
+@OptIn(ExperimentalHazeMaterialsApi::class)
+@Composable
+fun FloatingNavBar(
+    items: List<NavItem>,
+    selectedRoute: String?,
+    onSelect: (NavItem) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val haptic = LocalHapticFeedback.current
+    val scheme = MaterialTheme.colorScheme
+    val haze = LocalHazeState.current
+    val shape = RoundedCornerShape(30.dp)
+    Row(
+        modifier = modifier
+            .padding(horizontal = 18.dp)
+            .padding(bottom = 14.dp)
+            .fillMaxWidth()
+            .shadow(22.dp, shape, clip = false)
+            .clip(shape)
+            .then(
+                if (haze != null) Modifier.hazeEffect(haze, HazeMaterials.ultraThin(scheme.surface))
+                else Modifier.background(scheme.surface.copy(alpha = 0.92f)),
+            )
+            .background(scheme.onSurface.copy(alpha = 0.05f))
+            .border(1.dp, scheme.onSurface.copy(alpha = 0.10f), shape)
+            .padding(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        items.forEach { item ->
+            val selected = item.route == selectedRoute
+            val weight by animateFloatAsState(if (selected) 1.7f else 1f, tween(260), label = "navW")
+            val bg by animateColorAsState(if (selected) scheme.secondary else Color.Transparent, tween(220), label = "navBg")
+            val fg by animateColorAsState(if (selected) scheme.onSecondary else scheme.onSurfaceVariant, tween(220), label = "navFg")
+            Row(
+                modifier = Modifier
+                    .weight(weight)
+                    .clip(CircleShape)
+                    .background(bg)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                    ) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onSelect(item)
+                    }
+                    .padding(vertical = 13.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(item.icon, item.label, tint = fg, modifier = Modifier.size(22.dp))
+                if (selected) {
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        item.label,
+                        color = fg,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
+    }
 }

@@ -3,19 +3,20 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Dumbbell, centered -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M28,42h6v24h-6z" />
+        android:fillColor="#CBFF4D"
+        android:pathData="M40,52h28v4h-28z" />
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M20,48h6v12h-6z" />
+        android:fillColor="#CBFF4D"
+        android:pathData="M33,45h7v18h-7z" />
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M74,42h6v24h-6z" />
+        android:fillColor="#CBFF4D"
+        android:pathData="M68,45h7v18h-7z" />
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M82,48h6v12h-6z" />
+        android:fillColor="#CBFF4D"
+        android:pathData="M26,41h6v26h-6z" />
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M34,51h40v6h-40z" />
+        android:fillColor="#CBFF4D"
+        android:pathData="M76,41h6v26h-6z" />
 </vector>
