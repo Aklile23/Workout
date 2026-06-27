@@ -62,10 +62,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mypec.app.ui.theme.AccentGradient
-import com.mypec.app.ui.theme.GlowViolet
-import com.mypec.app.ui.theme.Lime
-import com.mypec.app.ui.theme.PrimaryGradient
-import com.mypec.app.ui.theme.VioletGradient
+import com.mypec.app.ui.theme.DarkCardGradient
+import com.mypec.app.ui.theme.GlowAccent
+import com.mypec.app.ui.theme.OnAccent
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -81,21 +80,12 @@ val LocalHazeState = staticCompositionLocalOf<HazeState?> { null }
 fun AppBackground(content: @Composable BoxScope.() -> Unit) {
     val base = MaterialTheme.colorScheme.background
     val dark = MaterialTheme.colorScheme.surface.luminanceIsDark()
-    val violetAlpha = if (dark) 0.40f else 0.22f
-    val limeAlpha = if (dark) 0.14f else 0.12f
+    val glowAlpha = if (dark) 0.07f else 0.05f
 
     val hazeState = remember { HazeState() }
 
-    val transition = rememberInfiniteTransition(label = "aurora")
-    val t by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(tween(16000, easing = LinearEasing), RepeatMode.Reverse),
-        label = "t",
-    )
-
     Box(modifier = Modifier.fillMaxSize()) {
-        // The blurrable background layer: calm near-solid dark with two soft glows.
+        // Calm, near-flat charcoal with a single faint accent glow in the corner.
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -103,19 +93,11 @@ fun AppBackground(content: @Composable BoxScope.() -> Unit) {
                 .drawBehind {
                     drawRect(base)
                     val w = size.width
-                    val h = size.height
                     drawRect(
                         brush = Brush.radialGradient(
-                            colors = listOf(GlowViolet.copy(alpha = violetAlpha), Color.Transparent),
-                            center = Offset(w * (0.18f + 0.12f * t), h * 0.04f),
-                            radius = w * 0.95f,
-                        ),
-                    )
-                    drawRect(
-                        brush = Brush.radialGradient(
-                            colors = listOf(Lime.copy(alpha = limeAlpha), Color.Transparent),
-                            center = Offset(w * (0.92f - 0.1f * t), h * (0.78f + 0.05f * t)),
-                            radius = w * 0.7f,
+                            colors = listOf(GlowAccent.copy(alpha = glowAlpha), Color.Transparent),
+                            center = Offset(w * 0.85f, 0f),
+                            radius = w * 0.85f,
                         ),
                     )
                 },
@@ -134,33 +116,12 @@ private fun Color.luminanceIsDark(): Boolean =
 @Composable
 private fun Modifier.glass(shape: Shape): Modifier {
     val scheme = MaterialTheme.colorScheme
-    val haze = LocalHazeState.current
-    // Bright top-left edge fading to a faint bottom edge -> reads as a lit glass pane.
-    val borderBrush = Brush.linearGradient(
-        listOf(scheme.onSurface.copy(alpha = 0.30f), scheme.onSurface.copy(alpha = 0.06f)),
-    )
-    // Glossy sheen that sits on top of the blurred backdrop for depth.
-    val sheen = Brush.verticalGradient(
-        listOf(scheme.onSurface.copy(alpha = 0.08f), Color.Transparent, scheme.surface.copy(alpha = 0.06f)),
-    )
-    val withShadowAndClip = this
-        .shadow(elevation = 18.dp, shape = shape, clip = false)
+    // Flat, solid card with a hairline border. No heavy shadow or glossy sheen.
+    val borderColor = scheme.onSurface.copy(alpha = 0.08f)
+    return this
         .clip(shape)
-    return if (haze != null) {
-        withShadowAndClip
-            .hazeEffect(state = haze, style = HazeMaterials.thin(scheme.surface))
-            .background(sheen)
-            .border(width = 1.dp, brush = borderBrush, shape = shape)
-    } else {
-        withShadowAndClip
-            .background(
-                Brush.verticalGradient(
-                    listOf(scheme.surface.copy(alpha = 0.86f), scheme.surface.copy(alpha = 0.62f)),
-                ),
-            )
-            .background(sheen)
-            .border(width = 1.dp, brush = borderBrush, shape = shape)
-    }
+        .background(scheme.surface)
+        .border(width = 1.dp, color = borderColor, shape = shape)
 }
 
 @Composable
@@ -168,7 +129,7 @@ fun MyPecCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val shape = RoundedCornerShape(26.dp)
+    val shape = RoundedCornerShape(22.dp)
     Column(
         modifier
             .fillMaxWidth()
@@ -207,19 +168,19 @@ fun GradientButton(
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
     enabled: Boolean = true,
-    gradient: List<Color> = PrimaryGradient,
+    gradient: List<Color> = AccentGradient,
+    contentColor: Color = OnAccent,
 ) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
-    val pressScale by animateFloatAsState(if (pressed) 0.96f else 1f, tween(120), label = "press")
+    val pressScale by animateFloatAsState(if (pressed) 0.97f else 1f, tween(120), label = "press")
     val haptic = LocalHapticFeedback.current
-    val shape = RoundedCornerShape(18.dp)
+    val shape = RoundedCornerShape(16.dp)
     val colors = if (enabled) gradient else gradient.map { it.copy(alpha = 0.4f) }
     Box(
         modifier = modifier
             .fillMaxWidth()
             .graphicsLayer { scaleX = pressScale; scaleY = pressScale }
-            .shadow(if (enabled) 8.dp else 0.dp, shape, clip = false)
             .clip(shape)
             .background(Brush.horizontalGradient(colors))
             .clickable(
@@ -236,10 +197,10 @@ fun GradientButton(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             if (icon != null) {
-                Icon(icon, contentDescription = null, tint = Color.White)
+                Icon(icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.size(8.dp))
             }
-            Text(text, color = Color.White, fontWeight = FontWeight.Bold)
+            Text(text, color = contentColor, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -304,9 +265,8 @@ fun StatTile(
     icon: ImageVector,
     modifier: Modifier = Modifier,
     accent: Color = MaterialTheme.colorScheme.primary,
-    gradient: List<Color> = PrimaryGradient,
 ) {
-    val shape = RoundedCornerShape(22.dp)
+    val shape = RoundedCornerShape(20.dp)
     Column(
         modifier
             .glass(shape)
@@ -314,16 +274,16 @@ fun StatTile(
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(13.dp))
-                .background(Brush.linearGradient(gradient)),
+                .size(38.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(accent.copy(alpha = 0.15f)),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+            Icon(icon, contentDescription = null, tint = accent, modifier = Modifier.size(20.dp))
         }
         Text(
             value,
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 12.dp),
         )
@@ -403,7 +363,7 @@ fun EmptyState(
             modifier = Modifier
                 .size(72.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .background(Brush.linearGradient(PrimaryGradient.map { it.copy(alpha = 0.18f) })),
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -495,21 +455,16 @@ fun AnimatedAppear(
 @Composable
 fun HeroCard(
     modifier: Modifier = Modifier,
-    gradient: List<Color> = VioletGradient,
+    gradient: List<Color> = DarkCardGradient,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val shape = RoundedCornerShape(30.dp)
+    val shape = RoundedCornerShape(24.dp)
     Column(
         modifier
             .fillMaxWidth()
-            .shadow(26.dp, shape, clip = false, ambientColor = gradient.first(), spotColor = gradient.first())
             .clip(shape)
-            .background(Brush.linearGradient(gradient))
-            .background(
-                Brush.verticalGradient(
-                    listOf(Color.White.copy(alpha = 0.10f), Color.Transparent, Color.Black.copy(alpha = 0.08f)),
-                ),
-            )
+            .background(Brush.verticalGradient(gradient))
+            .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f), shape)
             .padding(22.dp),
         content = content,
     )
@@ -582,20 +537,14 @@ fun FloatingNavBar(
 ) {
     val haptic = LocalHapticFeedback.current
     val scheme = MaterialTheme.colorScheme
-    val haze = LocalHazeState.current
     val shape = RoundedCornerShape(30.dp)
     Row(
         modifier = modifier
             .padding(horizontal = 18.dp)
             .padding(bottom = 14.dp)
             .fillMaxWidth()
-            .shadow(22.dp, shape, clip = false)
             .clip(shape)
-            .then(
-                if (haze != null) Modifier.hazeEffect(haze, HazeMaterials.ultraThin(scheme.surface))
-                else Modifier.background(scheme.surface.copy(alpha = 0.92f)),
-            )
-            .background(scheme.onSurface.copy(alpha = 0.05f))
+            .background(scheme.surface)
             .border(1.dp, scheme.onSurface.copy(alpha = 0.10f), shape)
             .padding(6.dp),
         horizontalArrangement = Arrangement.spacedBy(2.dp),

@@ -54,8 +54,6 @@ import com.mypec.app.ui.components.StatTile
 import com.mypec.app.ui.components.WeekProgress
 import com.mypec.app.ui.navigation.Dest
 import com.mypec.app.ui.theme.AccentGradient
-import com.mypec.app.ui.theme.PrimaryGradient
-import com.mypec.app.ui.theme.WarmGradient
 
 @Composable
 fun HomeScreen(
@@ -113,7 +111,7 @@ fun HomeScreen(
                         "WEEKLY PROGRESS",
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White.copy(alpha = 0.75f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(10.dp))
                     Row(verticalAlignment = Alignment.Bottom) {
@@ -121,7 +119,7 @@ fun HomeScreen(
                             "${state.adherence.percent}%",
                             style = MaterialTheme.typography.displayMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                         Spacer(Modifier.weight(1f))
                         Column(horizontalAlignment = Alignment.End) {
@@ -129,12 +127,12 @@ fun HomeScreen(
                                 "${state.adherence.completed}/${state.adherence.planned}",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
-                                "workouts",
+                                "workouts done",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.75f),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -177,13 +175,13 @@ fun HomeScreen(
                             Modifier
                                 .size(52.dp)
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(Brush.linearGradient(PrimaryGradient)),
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                             contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 if (state.isRestDay) Icons.Filled.MonitorWeight else Icons.Filled.FitnessCenter,
                                 contentDescription = null,
-                                tint = Color.White,
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(26.dp),
                             )
                         }
@@ -301,14 +299,12 @@ fun HomeScreen(
                         label = "Body weight",
                         value = state.latestWeight?.let { Format.kg(it.weightKg) } ?: "Add",
                         icon = Icons.Filled.MonitorWeight,
-                        gradient = WarmGradient,
                         modifier = Modifier.weight(1f),
                     )
                     StatTile(
                         label = "This week",
                         value = "${state.adherence.completed} done",
                         icon = Icons.Filled.FitnessCenter,
-                        gradient = AccentGradient,
                         modifier = Modifier.weight(1f),
                     )
                 }

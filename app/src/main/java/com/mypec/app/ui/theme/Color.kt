@@ -2,46 +2,34 @@ package com.mypec.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Brand (violet)
-val Violet = Color(0xFF8B5CF6)
-val VioletDark = Color(0xFF5B3FD6)
-val VioletLight = Color(0xFFCBBCFF)
-val Indigo = Color(0xFF6366F1)
-
-// Energy accent (electric lime) — used for CTAs, active states, "done"
+// ---- Single accent (electric lime) ----
 val Lime = Color(0xFFCBFF4D)
-val LimeDim = Color(0xFFA7DC2F)
+val LimeDim = Color(0xFFB2EA34)
+val LimeDeep = Color(0xFF55700E) // readable lime on light backgrounds
+val OnAccent = Color(0xFF12140A) // near-black text/icons that sit on lime
 
-val Mint = Color(0xFF3DE0B0)
-val MintDark = Color(0xFF12B488)
-val Coral = Color(0xFFFF6B81)
-val Amber = Color(0xFFFFC857)
-val AmberDark = Color(0xFFCF9A20)
+// ---- Functional ----
+val Coral = Color(0xFFFF6B6B)
 
-// Dark surfaces (premium near-black with a cool violet tint)
-val DarkBg = Color(0xFF09090F)
-val DarkSurface = Color(0xFF15151F)
-val DarkSurfaceVariant = Color(0xFF22212E)
-val DarkOnBg = Color(0xFFF5F4F9)
-val DarkOnBgMuted = Color(0xFF9A96AC)
-val DarkOnPrimary = Color(0xFF12091F)
+// ---- Dark neutrals (charcoal) ----
+val DarkBg = Color(0xFF0A0A0C)
+val DarkSurface = Color(0xFF141416)
+val DarkSurfaceVariant = Color(0xFF222227)
+val DarkOnBg = Color(0xFFF4F4F5)
+val DarkOnBgMuted = Color(0xFF97969E)
+val DarkOnPrimary = OnAccent
 
-// Light surfaces
-val LightBg = Color(0xFFF4F3FB)
+// ---- Light neutrals ----
+val LightBg = Color(0xFFF6F6F4)
 val LightSurface = Color(0xFFFFFFFF)
-val LightSurfaceVariant = Color(0xFFEAE7F6)
-val LightOnBg = Color(0xFF14121F)
-val LightOnBgMuted = Color(0xFF6A6580)
+val LightSurfaceVariant = Color(0xFFECECEA)
+val LightOnBg = Color(0xFF131316)
+val LightOnBgMuted = Color(0xFF6B6B72)
 
-// Gradients
-val PrimaryGradient = listOf(Color(0xFF9B6BFF), Color(0xFF6D4DF6))
-val VioletGradient = listOf(Color(0xFFA382FF), Color(0xFF7C5CFF), Color(0xFF5B3FD6))
-val AccentGradient = listOf(Color(0xFFD6FF5C), Color(0xFF9BE53A))
-val WarmGradient = listOf(Color(0xFFFF8FA8), Color(0xFFFF9E6D))
-val DarkCardGradient = listOf(Color(0xFF1C1B28), Color(0xFF131220))
+// ---- Gradients (kept subtle; lime is the only accent) ----
+val PrimaryGradient = listOf(Color(0xFFD4FF5C), Color(0xFFB2EA34))
+val AccentGradient = PrimaryGradient
+val DarkCardGradient = listOf(Color(0xFF18181B), Color(0xFF111113))
 
-// Aurora glow colors used behind the glass surfaces (kept subtle)
-val GlowViolet = Color(0xFF6D4DF6)
-val GlowMint = Color(0xFF22D3A8)
-val GlowBlue = Color(0xFF4F7BFF)
-val GlowPink = Color(0xFFFF6B9D)
+// ---- Faint background glow ----
+val GlowAccent = Lime
