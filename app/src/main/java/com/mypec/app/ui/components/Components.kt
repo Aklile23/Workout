@@ -29,11 +29,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +50,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -58,14 +62,25 @@ import com.mypec.app.ui.theme.GlowMint
 import com.mypec.app.ui.theme.GlowPink
 import com.mypec.app.ui.theme.GlowViolet
 import com.mypec.app.ui.theme.PrimaryGradient
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
+import dev.chrisbanes.haze.materials.HazeMaterials
+import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.delay
 
-/** Animated aurora background that lives behind all screen content. */
+/** Shared Haze state so glass cards can blur the aurora background drawn in [AppBackground]. */
+val LocalHazeState = staticCompositionLocalOf<HazeState?> { null }
+
+/** Animated aurora background (a Haze source) that lives behind all screen content. */
 @Composable
 fun AppBackground(content: @Composable BoxScope.() -> Unit) {
     val base = MaterialTheme.colorScheme.background
     val dark = MaterialTheme.colorScheme.surface.luminanceIsDark()
-    val glowAlpha = if (dark) 0.45f else 0.22f
+    val glowAlpha = if (dark) 0.55f else 0.30f
+
+    val hazeState = rememberHazeState()
 
     val transition = rememberInfiniteTransition(label = "aurora")
     val t by transition.animateFloat(
@@ -81,74 +96,80 @@ fun AppBackground(content: @Composable BoxScope.() -> Unit) {
         label = "t2",
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .drawBehind {
-                drawRect(base)
-                val w = size.width
-                val h = size.height
-                drawRect(
-                    brush = Brush.radialGradient(
-                        colors = listOf(GlowViolet.copy(alpha = glowAlpha), Color.Transparent),
-                        center = Offset(w * (0.15f + 0.25f * t), h * (0.08f + 0.05f * t2)),
-                        radius = w * 1.05f,
-                    ),
-                )
-                drawRect(
-                    brush = Brush.radialGradient(
-                        colors = listOf(GlowMint.copy(alpha = glowAlpha * 0.8f), Color.Transparent),
-                        center = Offset(w * (0.95f - 0.25f * t2), h * (0.35f + 0.1f * t)),
-                        radius = w * 0.95f,
-                    ),
-                )
-                drawRect(
-                    brush = Brush.radialGradient(
-                        colors = listOf(GlowBlue.copy(alpha = glowAlpha * 0.7f), Color.Transparent),
-                        center = Offset(w * (0.1f + 0.2f * t2), h * (0.95f - 0.08f * t)),
-                        radius = w * 1.0f,
-                    ),
-                )
-                drawRect(
-                    brush = Brush.radialGradient(
-                        colors = listOf(GlowPink.copy(alpha = glowAlpha * 0.5f), Color.Transparent),
-                        center = Offset(w * (0.85f - 0.2f * t), h * 0.85f),
-                        radius = w * 0.8f,
-                    ),
-                )
-            },
-        content = content,
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        // The blurrable background layer.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .hazeSource(state = hazeState)
+                .drawBehind {
+                    drawRect(base)
+                    val w = size.width
+                    val h = size.height
+                    drawRect(
+                        brush = Brush.radialGradient(
+                            colors = listOf(GlowViolet.copy(alpha = glowAlpha), Color.Transparent),
+                            center = Offset(w * (0.15f + 0.25f * t), h * (0.08f + 0.05f * t2)),
+                            radius = w * 1.05f,
+                        ),
+                    )
+                    drawRect(
+                        brush = Brush.radialGradient(
+                            colors = listOf(GlowMint.copy(alpha = glowAlpha * 0.85f), Color.Transparent),
+                            center = Offset(w * (0.95f - 0.25f * t2), h * (0.35f + 0.1f * t)),
+                            radius = w * 0.95f,
+                        ),
+                    )
+                    drawRect(
+                        brush = Brush.radialGradient(
+                            colors = listOf(GlowBlue.copy(alpha = glowAlpha * 0.75f), Color.Transparent),
+                            center = Offset(w * (0.1f + 0.2f * t2), h * (0.95f - 0.08f * t)),
+                            radius = w * 1.0f,
+                        ),
+                    )
+                    drawRect(
+                        brush = Brush.radialGradient(
+                            colors = listOf(GlowPink.copy(alpha = glowAlpha * 0.55f), Color.Transparent),
+                            center = Offset(w * (0.85f - 0.2f * t), h * 0.85f),
+                            radius = w * 0.8f,
+                        ),
+                    )
+                },
+        )
+        CompositionLocalProvider(LocalHazeState provides hazeState) {
+            Box(modifier = Modifier.fillMaxSize(), content = content)
+        }
+    }
 }
 
 private fun Color.luminanceIsDark(): Boolean =
     (0.299 * red + 0.587 * green + 0.114 * blue) < 0.5
 
-/** Frosted glass surface modifier used by cards and tiles. */
+/** Frosted glass surface modifier. Uses real backdrop blur via Haze when available. */
+@OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 private fun Modifier.glass(shape: Shape): Modifier {
     val scheme = MaterialTheme.colorScheme
-    return this
-        .shadow(elevation = 12.dp, shape = shape, clip = false)
+    val haze = LocalHazeState.current
+    val borderBrush = Brush.linearGradient(
+        listOf(scheme.onSurface.copy(alpha = 0.22f), scheme.onSurface.copy(alpha = 0.05f)),
+    )
+    val withShadowAndClip = this
+        .shadow(elevation = 14.dp, shape = shape, clip = false)
         .clip(shape)
-        .background(
-            Brush.verticalGradient(
-                listOf(
-                    scheme.surface.copy(alpha = 0.72f),
-                    scheme.surface.copy(alpha = 0.42f),
+    return if (haze != null) {
+        withShadowAndClip
+            .hazeEffect(state = haze, style = HazeMaterials.regular(scheme.surface))
+            .border(width = 1.dp, brush = borderBrush, shape = shape)
+    } else {
+        withShadowAndClip
+            .background(
+                Brush.verticalGradient(
+                    listOf(scheme.surface.copy(alpha = 0.72f), scheme.surface.copy(alpha = 0.42f)),
                 ),
-            ),
-        )
-        .border(
-            width = 1.dp,
-            brush = Brush.linearGradient(
-                listOf(
-                    scheme.onSurface.copy(alpha = 0.20f),
-                    scheme.onSurface.copy(alpha = 0.04f),
-                ),
-            ),
-            shape = shape,
-        )
+            )
+            .border(width = 1.dp, brush = borderBrush, shape = shape)
+    }
 }
 
 @Composable
@@ -200,6 +221,7 @@ fun GradientButton(
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val pressScale by animateFloatAsState(if (pressed) 0.96f else 1f, tween(120), label = "press")
+    val haptic = LocalHapticFeedback.current
     val shape = RoundedCornerShape(18.dp)
     val colors = if (enabled) gradient else gradient.map { it.copy(alpha = 0.4f) }
     Box(
@@ -213,7 +235,10 @@ fun GradientButton(
                 interactionSource = interaction,
                 indication = null,
                 enabled = enabled,
-                onClick = onClick,
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onClick()
+                },
             )
             .padding(vertical = 15.dp, horizontal = 20.dp),
         contentAlignment = Alignment.Center,
@@ -240,6 +265,7 @@ fun GlassButton(
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val pressScale by animateFloatAsState(if (pressed) 0.97f else 1f, tween(120), label = "press")
+    val haptic = LocalHapticFeedback.current
     val shape = RoundedCornerShape(18.dp)
     val scheme = MaterialTheme.colorScheme
     Box(
@@ -259,7 +285,14 @@ fun GlassButton(
                 ),
                 shape,
             )
-            .clickable(interactionSource = interaction, indication = null, onClick = onClick)
+            .clickable(
+                interactionSource = interaction,
+                indication = null,
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onClick()
+                },
+            )
             .padding(vertical = 14.dp, horizontal = 16.dp),
         contentAlignment = Alignment.Center,
     ) {
