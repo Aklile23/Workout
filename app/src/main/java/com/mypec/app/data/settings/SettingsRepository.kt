@@ -16,7 +16,7 @@ import javax.inject.Singleton
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 data class AppSettings(
-    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val themeMode: ThemeMode = ThemeMode.DARK,
     val dynamicColor: Boolean = false,
     val barWeightKg: Double = 20.0,
     val defaultRestSeconds: Int = 120,
@@ -43,7 +43,7 @@ class SettingsRepository @Inject constructor(
 
     val settings: Flow<AppSettings> = context.dataStore.data.map { p ->
         AppSettings(
-            themeMode = runCatching { ThemeMode.valueOf(p[Keys.THEME] ?: "SYSTEM") }.getOrDefault(ThemeMode.SYSTEM),
+            themeMode = runCatching { ThemeMode.valueOf(p[Keys.THEME] ?: "DARK") }.getOrDefault(ThemeMode.DARK),
             dynamicColor = p[Keys.DYNAMIC] ?: false,
             barWeightKg = p[Keys.BAR] ?: 20.0,
             defaultRestSeconds = p[Keys.REST] ?: 120,

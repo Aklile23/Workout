@@ -2,53 +2,45 @@ package com.mypec.app.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.googlefonts.Font
-import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
 import com.mypec.app.R
 
-private val provider = GoogleFont.Provider(
-    providerAuthority = "com.google.android.gms.fonts",
-    providerPackage = "com.google.android.gms",
-    certificates = R.array.com_google_android_gms_fonts_certs,
-)
-
-private val displayGoogleFont = GoogleFont("Space Grotesk")
-private val bodyGoogleFont = GoogleFont("Inter")
-
-// Distinctive display family for headings, body family for everything else.
-// If Google Play Services can't serve the fonts, Compose falls back gracefully.
+// Bundled variable fonts (no network / Play Services dependency, so the
+// designed look is guaranteed offline). Compose applies the wght axis from
+// the requested FontWeight automatically on API 26+.
 val DisplayFamily = FontFamily(
-    Font(googleFont = displayGoogleFont, fontProvider = provider, weight = FontWeight.Medium),
-    Font(googleFont = displayGoogleFont, fontProvider = provider, weight = FontWeight.SemiBold),
-    Font(googleFont = displayGoogleFont, fontProvider = provider, weight = FontWeight.Bold),
+    Font(R.font.space_grotesk, FontWeight.Normal),
+    Font(R.font.space_grotesk, FontWeight.Medium),
+    Font(R.font.space_grotesk, FontWeight.SemiBold),
+    Font(R.font.space_grotesk, FontWeight.Bold),
 )
 
 val BodyFamily = FontFamily(
-    Font(googleFont = bodyGoogleFont, fontProvider = provider, weight = FontWeight.Normal),
-    Font(googleFont = bodyGoogleFont, fontProvider = provider, weight = FontWeight.Medium),
-    Font(googleFont = bodyGoogleFont, fontProvider = provider, weight = FontWeight.SemiBold),
-    Font(googleFont = bodyGoogleFont, fontProvider = provider, weight = FontWeight.Bold),
+    Font(R.font.inter, FontWeight.Normal),
+    Font(R.font.inter, FontWeight.Medium),
+    Font(R.font.inter, FontWeight.SemiBold),
+    Font(R.font.inter, FontWeight.Bold),
 )
 
 private val default = Typography()
 
 val MyPecTypography = Typography(
-    displayLarge = default.displayLarge.copy(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold),
-    displayMedium = default.displayMedium.copy(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold),
-    displaySmall = default.displaySmall.copy(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold),
-    headlineLarge = default.headlineLarge.copy(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold),
-    headlineMedium = default.headlineMedium.copy(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold),
-    headlineSmall = default.headlineSmall.copy(fontFamily = DisplayFamily, fontWeight = FontWeight.SemiBold),
-    titleLarge = default.titleLarge.copy(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold),
-    titleMedium = default.titleMedium.copy(fontFamily = BodyFamily, fontWeight = FontWeight.SemiBold),
-    titleSmall = default.titleSmall.copy(fontFamily = BodyFamily, fontWeight = FontWeight.SemiBold),
-    bodyLarge = TextStyle(fontFamily = BodyFamily, fontSize = 16.sp, fontWeight = FontWeight.Normal, lineHeight = 24.sp),
-    bodyMedium = default.bodyMedium.copy(fontFamily = BodyFamily),
-    bodySmall = default.bodySmall.copy(fontFamily = BodyFamily),
-    labelLarge = default.labelLarge.copy(fontFamily = BodyFamily, fontWeight = FontWeight.SemiBold),
-    labelMedium = default.labelMedium.copy(fontFamily = BodyFamily, fontWeight = FontWeight.Medium),
-    labelSmall = default.labelSmall.copy(fontFamily = BodyFamily, fontWeight = FontWeight.Medium),
+    displayLarge = TextStyle(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold, fontSize = 52.sp, lineHeight = 56.sp, letterSpacing = (-1.5).sp),
+    displayMedium = TextStyle(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold, fontSize = 42.sp, lineHeight = 48.sp, letterSpacing = (-1).sp),
+    displaySmall = TextStyle(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold, fontSize = 34.sp, lineHeight = 40.sp, letterSpacing = (-0.5).sp),
+    headlineLarge = TextStyle(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold, fontSize = 30.sp, lineHeight = 36.sp, letterSpacing = (-0.5).sp),
+    headlineMedium = TextStyle(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold, fontSize = 26.sp, lineHeight = 32.sp, letterSpacing = (-0.4).sp),
+    headlineSmall = TextStyle(fontFamily = DisplayFamily, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, lineHeight = 28.sp, letterSpacing = (-0.3).sp),
+    titleLarge = TextStyle(fontFamily = DisplayFamily, fontWeight = FontWeight.Bold, fontSize = 20.sp, lineHeight = 26.sp, letterSpacing = (-0.2).sp),
+    titleMedium = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, lineHeight = 22.sp, letterSpacing = 0.sp),
+    titleSmall = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.1.sp),
+    bodyLarge = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 24.sp, letterSpacing = 0.15.sp),
+    bodyMedium = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.2.sp),
+    bodySmall = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.3.sp),
+    labelLarge = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.1.sp),
+    labelMedium = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Medium, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.4.sp),
+    labelSmall = TextStyle(fontFamily = BodyFamily, fontWeight = FontWeight.Medium, fontSize = 11.sp, lineHeight = 14.sp, letterSpacing = 0.5.sp),
 )

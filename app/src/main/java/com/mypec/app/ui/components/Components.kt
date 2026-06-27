@@ -150,23 +150,30 @@ private fun Color.luminanceIsDark(): Boolean =
 private fun Modifier.glass(shape: Shape): Modifier {
     val scheme = MaterialTheme.colorScheme
     val haze = LocalHazeState.current
+    // Bright top-left edge fading to a faint bottom edge -> reads as a lit glass pane.
     val borderBrush = Brush.linearGradient(
-        listOf(scheme.onSurface.copy(alpha = 0.22f), scheme.onSurface.copy(alpha = 0.05f)),
+        listOf(scheme.onSurface.copy(alpha = 0.30f), scheme.onSurface.copy(alpha = 0.06f)),
+    )
+    // Glossy sheen that sits on top of the blurred backdrop for depth.
+    val sheen = Brush.verticalGradient(
+        listOf(scheme.onSurface.copy(alpha = 0.08f), Color.Transparent, scheme.surface.copy(alpha = 0.06f)),
     )
     val withShadowAndClip = this
-        .shadow(elevation = 14.dp, shape = shape, clip = false)
+        .shadow(elevation = 18.dp, shape = shape, clip = false)
         .clip(shape)
     return if (haze != null) {
         withShadowAndClip
-            .hazeEffect(state = haze, style = HazeMaterials.regular(scheme.surface))
+            .hazeEffect(state = haze, style = HazeMaterials.thin(scheme.surface))
+            .background(sheen)
             .border(width = 1.dp, brush = borderBrush, shape = shape)
     } else {
         withShadowAndClip
             .background(
                 Brush.verticalGradient(
-                    listOf(scheme.surface.copy(alpha = 0.72f), scheme.surface.copy(alpha = 0.42f)),
+                    listOf(scheme.surface.copy(alpha = 0.86f), scheme.surface.copy(alpha = 0.62f)),
                 ),
             )
+            .background(sheen)
             .border(width = 1.dp, brush = borderBrush, shape = shape)
     }
 }
