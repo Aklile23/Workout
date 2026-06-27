@@ -72,8 +72,8 @@ private fun PlateCalculatorCard() {
 
     MyPecCard {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            AppTextField("Target (kg)", target, Modifier.weight(1f)) { target = it }
-            AppTextField("Bar (kg)", bar, Modifier.weight(1f)) { bar = it }
+            AppTextField("Target (kg)", target, { target = it }, Modifier.weight(1f))
+            AppTextField("Bar (kg)", bar, { bar = it }, Modifier.weight(1f))
         }
         Spacer(Modifier.height(16.dp))
         if (result.perSide.isEmpty()) {
@@ -113,8 +113,8 @@ private fun OneRmCard() {
 
     MyPecCard {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            AppTextField("Weight (kg)", weight, Modifier.weight(1f)) { weight = it }
-            AppTextField("Reps", reps, Modifier.weight(1f)) { reps = it }
+            AppTextField("Weight (kg)", weight, { weight = it }, Modifier.weight(1f))
+            AppTextField("Reps", reps, { reps = it }, Modifier.weight(1f))
         }
         Spacer(Modifier.height(16.dp))
         MetricValue("Estimated 1RM", Format.kg(oneRm))
@@ -134,7 +134,7 @@ private fun WarmupCard() {
     val sets = WarmupGenerator.generate(w)
 
     MyPecCard {
-        AppTextField("Working weight (kg)", working, Modifier.fillMaxWidth()) { working = it }
+        AppTextField("Working weight (kg)", working, { working = it }, Modifier.fillMaxWidth())
         Spacer(Modifier.height(16.dp))
         if (sets.isEmpty()) {
             Text(
