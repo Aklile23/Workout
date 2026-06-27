@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.item
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.MaterialTheme
@@ -109,7 +108,7 @@ private fun Heatmap(statusByDay: Map<Long, String>) {
     val skipped = MaterialTheme.colorScheme.error
     val empty = MaterialTheme.colorScheme.surfaceVariant
 
-    Canvas(Modifier.fillMaxWidth().height(7 * 16.dp)) {
+    Canvas(Modifier.fillMaxWidth().height((7 * 16).dp)) {
         val cell = size.width / weeks
         val gap = cell * 0.15f
         val side = cell - gap

@@ -39,7 +39,7 @@ class ProgressViewModel @Inject constructor(
 
         val weekBuckets = sets.groupBy { (dateBySession[it.sessionId] ?: 0L) / 7 }
             .toSortedMap()
-            .entries.takeLast(8)
+            .entries.toList().takeLast(8)
             .mapIndexed { idx, entry ->
                 "W${idx + 1}" to entry.value.sumOf { it.weightKg * it.reps }.toFloat()
             }
