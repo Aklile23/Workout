@@ -34,7 +34,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mypec.app.ui.theme.AccentGradient
-import com.mypec.app.ui.theme.GlowAccent
 import kotlinx.coroutines.delay
 
 @Composable
@@ -61,14 +60,7 @@ fun SplashScreen(onFinished: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(bg)
-            .background(
-                Brush.radialGradient(
-                    colors = listOf(GlowAccent.copy(alpha = 0.12f), Color.Transparent),
-                    center = Offset.Unspecified,
-                    radius = 900f,
-                ),
-            ),
+            .background(bg),
         contentAlignment = Alignment.Center,
     ) {
         Column(

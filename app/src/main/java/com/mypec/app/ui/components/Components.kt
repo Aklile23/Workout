@@ -1,6 +1,7 @@
 package com.mypec.app.ui.components
 
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -66,10 +67,7 @@ import com.mypec.app.ui.theme.DarkCardGradient
 import com.mypec.app.ui.theme.GlowAccent
 import com.mypec.app.ui.theme.OnAccent
 import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
-import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
-import dev.chrisbanes.haze.materials.HazeMaterials
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -117,8 +115,7 @@ fun AppBackground(content: @Composable BoxScope.() -> Unit) {
 private fun Color.luminanceIsDark(): Boolean =
     (0.299 * red + 0.587 * green + 0.114 * blue) < 0.5
 
-/** Frosted glass surface modifier. Uses real backdrop blur via Haze when available. */
-@OptIn(ExperimentalHazeMaterialsApi::class)
+/** Frosted glass surface modifier. */
 @Composable
 private fun Modifier.glass(shape: Shape): Modifier {
     val scheme = MaterialTheme.colorScheme
@@ -732,7 +729,6 @@ fun WeekProgress(
 data class NavItem(val route: String, val label: String, val icon: ImageVector)
 
 /** Floating pill navigation bar; the active item expands into a filled accent pill. */
-@OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 fun FloatingNavBar(
     items: List<NavItem>,
@@ -757,12 +753,11 @@ fun FloatingNavBar(
     ) {
         items.forEach { item ->
             val selected = item.route == selectedRoute
-            val weight by animateFloatAsState(if (selected) 1.7f else 1f, tween(260), label = "navW")
             val bg by animateColorAsState(if (selected) scheme.secondary else Color.Transparent, tween(220), label = "navBg")
             val fg by animateColorAsState(if (selected) scheme.onSecondary else scheme.onSurfaceVariant, tween(220), label = "navFg")
             Row(
                 modifier = Modifier
-                    .weight(weight)
+                    .weight(1f)
                     .clip(CircleShape)
                     .background(bg)
                     .clickable(
@@ -772,20 +767,22 @@ fun FloatingNavBar(
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onSelect(item)
                     }
-                    .padding(vertical = 13.dp),
+                    .padding(vertical = 13.dp, horizontal = 4.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(item.icon, item.label, tint = fg, modifier = Modifier.size(22.dp))
-                if (selected) {
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        item.label,
-                        color = fg,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                    )
+                AnimatedVisibility(visible = selected) {
+                    Row {
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            item.label,
+                            color = fg,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                        )
+                    }
                 }
             }
         }
