@@ -20,92 +20,94 @@ val InterFamily = FontFamily(
 val DisplayFamily = InterFamily
 val BodyFamily = InterFamily
 
-private val base = Typography(defaultFontFamily = InterFamily)
+private val base = Typography()
+
+private fun TextStyle.inter(): TextStyle = copy(fontFamily = InterFamily)
 
 val MyPecTypography = base.copy(
-    displayLarge = base.displayLarge.copy(
+    displayLarge = base.displayLarge.inter().copy(
         fontWeight = FontWeight.Bold,
         fontSize = 36.sp,
         lineHeight = 42.sp,
         letterSpacing = (-0.5).sp,
     ),
-    displayMedium = base.displayMedium.copy(
+    displayMedium = base.displayMedium.inter().copy(
         fontWeight = FontWeight.Bold,
         fontSize = 30.sp,
         lineHeight = 36.sp,
         letterSpacing = (-0.4).sp,
     ),
-    displaySmall = base.displaySmall.copy(
+    displaySmall = base.displaySmall.inter().copy(
         fontWeight = FontWeight.Bold,
         fontSize = 24.sp,
         lineHeight = 30.sp,
         letterSpacing = (-0.3).sp,
     ),
-    headlineLarge = base.headlineLarge.copy(
+    headlineLarge = base.headlineLarge.inter().copy(
         fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = (-0.2).sp,
     ),
-    headlineMedium = base.headlineMedium.copy(
+    headlineMedium = base.headlineMedium.inter().copy(
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
         lineHeight = 26.sp,
         letterSpacing = (-0.15).sp,
     ),
-    headlineSmall = base.headlineSmall.copy(
+    headlineSmall = base.headlineSmall.inter().copy(
         fontWeight = FontWeight.SemiBold,
         fontSize = 18.sp,
         lineHeight = 24.sp,
         letterSpacing = (-0.1).sp,
     ),
-    titleLarge = base.titleLarge.copy(
+    titleLarge = base.titleLarge.inter().copy(
         fontWeight = FontWeight.SemiBold,
         fontSize = 17.sp,
         lineHeight = 24.sp,
     ),
-    titleMedium = base.titleMedium.copy(
+    titleMedium = base.titleMedium.inter().copy(
         fontWeight = FontWeight.SemiBold,
         fontSize = 15.sp,
         lineHeight = 22.sp,
     ),
-    titleSmall = base.titleSmall.copy(
+    titleSmall = base.titleSmall.inter().copy(
         fontWeight = FontWeight.Medium,
         fontSize = 13.sp,
         lineHeight = 18.sp,
         letterSpacing = 0.1.sp,
     ),
-    bodyLarge = base.bodyLarge.copy(
+    bodyLarge = base.bodyLarge.inter().copy(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.15.sp,
     ),
-    bodyMedium = base.bodyMedium.copy(
+    bodyMedium = base.bodyMedium.inter().copy(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,
     ),
-    bodySmall = base.bodySmall.copy(
+    bodySmall = base.bodySmall.inter().copy(
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.2.sp,
     ),
-    labelLarge = base.labelLarge.copy(
+    labelLarge = base.labelLarge.inter().copy(
         fontWeight = FontWeight.SemiBold,
         fontSize = 13.sp,
         lineHeight = 18.sp,
         letterSpacing = 0.15.sp,
     ),
-    labelMedium = base.labelMedium.copy(
+    labelMedium = base.labelMedium.inter().copy(
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.3.sp,
     ),
-    labelSmall = base.labelSmall.copy(
+    labelSmall = base.labelSmall.inter().copy(
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 14.sp,
