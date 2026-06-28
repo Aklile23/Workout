@@ -35,13 +35,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,8 +64,6 @@ import com.mypec.app.ui.theme.AccentGradient
 import com.mypec.app.ui.theme.DarkCardGradient
 import com.mypec.app.ui.theme.GlowAccent
 import com.mypec.app.ui.theme.OnAccent
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -76,24 +72,17 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 
-/** Shared Haze state so glass cards can blur the aurora background drawn in [AppBackground]. */
-val LocalHazeState = staticCompositionLocalOf<HazeState?> { null }
-
-/** Animated aurora background (a Haze source) that lives behind all screen content. */
+/** App background: calm near-flat charcoal with a faint accent glow. */
 @Composable
 fun AppBackground(content: @Composable BoxScope.() -> Unit) {
     val base = MaterialTheme.colorScheme.background
     val dark = MaterialTheme.colorScheme.surface.luminanceIsDark()
     val glowAlpha = if (dark) 0.07f else 0.05f
 
-    val hazeState = remember { HazeState() }
-
     Box(modifier = Modifier.fillMaxSize()) {
-        // Calm, near-flat charcoal with a single faint accent glow in the corner.
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .hazeSource(state = hazeState)
                 .drawBehind {
                     drawRect(base)
                     val w = size.width
@@ -106,9 +95,7 @@ fun AppBackground(content: @Composable BoxScope.() -> Unit) {
                     )
                 },
         )
-        CompositionLocalProvider(LocalHazeState provides hazeState) {
-            Box(modifier = Modifier.fillMaxSize(), content = content)
-        }
+        Box(modifier = Modifier.fillMaxSize(), content = content)
     }
 }
 
